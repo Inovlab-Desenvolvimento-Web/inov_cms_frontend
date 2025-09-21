@@ -1,6 +1,7 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { PublicApiService } from 'core';
 import { Category, Page } from '@core/models/page.models';
 
 @Component({
@@ -8,7 +9,7 @@ import { Category, Page } from '@core/models/page.models';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <section class="mx-auto max-w-4xl px-6 py-12">
+    <section class="mx-auto max-w-4xl px-6 py-12" *ngIf="category()">
       <header class="space-y-2">
         <p class="text-sm uppercase tracking-wide text-indigo-600">Categoria</p>
         <h1 class="text-3xl font-bold text-slate-900">{{ category()?.name }}</h1>
@@ -31,28 +32,24 @@ import { Category, Page } from '@core/models/page.models';
   `
 })
 export class CategoryComponent {
-  private readonly categories = signal<Category[]>([
-    { id: 'noticias', name: 'Notícias', description: 'Atualizações e comunicados importantes.' }
-  ]);
+  private readonly route = inject(ActivatedRoute);
+  private readonly api = inject(PublicApiService);
 
-  private readonly pages = signal<Page[]>([
-    {
-      id: '1',
-      title: 'Novas iniciativas',
-      slug: 'novas-iniciativas',
-      content: '<p>Detalhes sobre ações municipais.</p>',
-      status: 'published',
-      categoryId: 'noticias',
-      isHome: false,
-      updatedAt: new Date().toISOString()
-    }
-  ]);
+  private readonly categorySignal = signal<Category | null>(null);
+  private readonly pagesSignal = signal<Page[]>([]);
 
-  private readonly id = signal(this.route.snapshot.paramMap.get('id'));
+  readonly category = computed(() => this.categorySignal());
+  readonly categoryPages = computed(() => this.pagesSignal());
 
-  readonly category = computed(() => this.categories().find(category => category.id === this.id()) ?? this.categories()[0]);
-
-  readonly categoryPages = computed(() => this.pages().filter(page => page.categoryId === this.category()?.id));
-
-  constructor(private readonly route: ActivatedRoute) {}
+  constructor() {
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.api.getPagesByCategory(id).subscribe(pages => {
+      this.pagesSignal.set(pages);
+      this.categorySignal.set(
+        pages.length
+          ? { id, name: id, description: undefined }
+          : { id, name: id }
+      );
+    });
+  }
 }

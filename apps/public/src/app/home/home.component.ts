@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { PublicApiService } from 'core';
+import { Page } from '@core/models/page.models';
 
 @Component({
   selector: 'app-home',
@@ -8,12 +10,10 @@ import { RouterLink } from '@angular/router';
   imports: [CommonModule, RouterLink],
   template: `
     <section class="mx-auto flex max-w-5xl flex-col gap-12 px-6 py-12">
-      <header class="space-y-4 text-center">
+      <header class="space-y-4 text-center" *ngIf="page()">
         <p class="text-sm font-semibold uppercase tracking-wide text-indigo-600">Portal Municipal</p>
-        <h1 class="text-4xl font-bold text-slate-900">Bem-vindo ao InovCMS</h1>
-        <p class="text-lg text-slate-600">
-          Explore informações atualizadas, serviços e conteúdos temáticos preparados pela equipe administrativa.
-        </p>
+        <h1 class="text-4xl font-bold text-slate-900">{{ page()?.title }}</h1>
+        <p class="text-lg text-slate-600" [innerHTML]="page()?.content"></p>
       </header>
 
       <div class="grid gap-6 md:grid-cols-3">
@@ -36,4 +36,13 @@ import { RouterLink } from '@angular/router';
     </section>
   `
 })
-export class HomeComponent {}
+export class HomeComponent {
+  private readonly api = inject(PublicApiService);
+
+  private readonly pageSignal = signal<Page | null>(null);
+  readonly page = computed(() => this.pageSignal());
+
+  constructor() {
+    this.api.getHome().subscribe(page => this.pageSignal.set(page));
+  }
+}

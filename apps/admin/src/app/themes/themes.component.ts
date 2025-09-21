@@ -1,11 +1,13 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Theme } from '@core/models/page.models';
+import { AdminApiService } from 'core';
 
 @Component({
   selector: 'app-themes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <section class="space-y-6">
       <header class="flex flex-wrap items-center justify-between gap-4">
@@ -29,9 +31,12 @@ import { Theme } from '@core/models/page.models';
               <button class="rounded border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50">
                 Visualizar
               </button>
-              <button class="rounded bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-500">
+              <a
+                [routerLink]="['/themes', 'editor', theme.id]"
+                class="rounded bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-500"
+              >
                 Editar
-              </button>
+              </a>
             </div>
           </div>
         </article>
@@ -39,8 +44,12 @@ import { Theme } from '@core/models/page.models';
     </section>
   `
 })
-export class ThemesComponent {
-  readonly themes = signal<Theme[]>([
-    { id: 'default', name: 'Tema Padrão', css: ':root { --color-primary: #2563eb; }' }
-  ]);
+export class ThemesComponent implements OnInit {
+  private readonly api = inject(AdminApiService);
+
+  readonly themes = signal<Theme[]>([]);
+
+  ngOnInit(): void {
+    this.api.listThemes().subscribe(themes => this.themes.set(themes));
+  }
 }

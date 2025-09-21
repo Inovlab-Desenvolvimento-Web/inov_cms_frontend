@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Region } from '@core/models/page.models';
+import { AdminApiService } from 'core';
 
 @Component({
   selector: 'app-regions',
@@ -27,9 +28,12 @@ import { Region } from '@core/models/page.models';
     </section>
   `
 })
-export class RegionsComponent {
-  readonly regions = signal<Region[]>([
-    { id: 'central', city: 'Cidade Central', district: 'Distrito 1' },
-    { id: 'north', city: 'Zona Norte', district: 'Distrito 2' }
-  ]);
+export class RegionsComponent implements OnInit {
+  private readonly api = inject(AdminApiService);
+
+  readonly regions = signal<Region[]>([]);
+
+  ngOnInit(): void {
+    this.api.listRegions().subscribe(regions => this.regions.set(regions));
+  }
 }

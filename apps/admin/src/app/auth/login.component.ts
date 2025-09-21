@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from 'core';
 
 @Component({
   selector: 'app-login',
@@ -54,6 +56,9 @@ export class LoginComponent {
   protected readonly form: FormGroup;
   protected readonly submitted = signal(false);
 
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
   constructor(private readonly fb: FormBuilder) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -64,7 +69,11 @@ export class LoginComponent {
   submit(): void {
     this.submitted.set(true);
     if (this.form.valid) {
-      console.log('Login', this.form.value);
+      const { email, password } = this.form.value;
+      this.auth.login(email, password).subscribe(res => {
+        this.auth.setSession(res);
+        this.router.navigateByUrl('/');
+      });
     }
   }
 }

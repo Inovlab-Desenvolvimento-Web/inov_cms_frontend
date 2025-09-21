@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Category } from '@core/models/page.models';
+import { AdminApiService } from 'core';
 
 @Component({
   selector: 'app-categories',
@@ -27,9 +28,12 @@ import { Category } from '@core/models/page.models';
     </section>
   `
 })
-export class CategoriesComponent {
-  readonly categories = signal<Category[]>([
-    { id: 'news', name: 'Notícias', description: 'Atualizações e comunicados importantes.' },
-    { id: 'services', name: 'Serviços', description: 'Informações sobre serviços municipais.' }
-  ]);
+export class CategoriesComponent implements OnInit {
+  private readonly api = inject(AdminApiService);
+
+  readonly categories = signal<Category[]>([]);
+
+  ngOnInit(): void {
+    this.api.listCategories().subscribe(categories => this.categories.set(categories));
+  }
 }

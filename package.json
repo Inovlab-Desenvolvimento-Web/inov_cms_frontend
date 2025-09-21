@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start:admin": "ng serve admin",
-    "start:public": "ng serve public",
+    "start:admin": "ng serve admin -o",
+    "start:public": "ng serve public -o",
     "build": "ng build",
+    "build:admin": "ng build admin",
+    "build:public": "ng build public",
     "test": "ng test",
     "lint": "ng lint",
     "format": "prettier --write ."
