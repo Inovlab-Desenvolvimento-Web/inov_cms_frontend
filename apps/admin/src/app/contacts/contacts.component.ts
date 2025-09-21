@@ -21,7 +21,9 @@ import { AdminApiService } from 'core';
 
       <div class="grid gap-4 md:grid-cols-2">
         <article *ngFor="let contact of contacts()" class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-          <h3 class="text-base font-semibold text-slate-800">{{ contact.email || contact.phone }}</h3>
+          <h3 class="text-base font-semibold text-slate-800">
+            {{ contact.email || contact.phone || 'Contato' }}
+          </h3>
           <ul class="mt-2 space-y-1 text-sm text-slate-500">
             <li *ngIf="contact.phone">Telefone: {{ contact.phone }}</li>
             <li *ngIf="contact.whatsapp">WhatsApp: {{ contact.whatsapp }}</li>

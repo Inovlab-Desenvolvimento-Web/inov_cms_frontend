@@ -28,7 +28,13 @@ import { AdminApiService } from 'core';
               <p class="text-sm text-slate-500">{{ theme.css ? 'Tema personalizado' : 'Tema padrão' }}</p>
             </div>
             <div class="flex gap-2">
-              <a [routerLink]="['/themes', 'editor']" class="rounded bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-500">
+              <button class="rounded border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50">
+                Visualizar
+              </button>
+              <a
+                [routerLink]="['/themes', 'editor', theme.id]"
+                class="rounded bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-500"
+              >
                 Editar
               </a>
             </div>

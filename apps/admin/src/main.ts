@@ -7,7 +7,9 @@ import { jwtInterceptor } from './app/shared/interceptors/jwt.interceptor';
 import { errorInterceptor } from './app/shared/interceptors/error.interceptor';
 
 const config = mergeApplicationConfig(appConfig, {
-  providers: [provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor]))]
+  providers: [
+    provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor]))
+  ]
 });
 
 bootstrapApplication(AppComponent, config).catch(err => console.error(err));
